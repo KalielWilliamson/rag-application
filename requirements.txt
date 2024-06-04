@@ -1,0 +1,12 @@
+pika
+transformers
+torch
+langchain
+langchain-community
+llama-cpp-python
+pymilvus
+streamlit
+redis
+faiss-cpu
+sentence-transformers
+langchainhub

@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  vector_store_repository:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vector_store_repository
+    command: ["python", "vector_store_repository.py"]
+    ports:
+      - "${VIEW_SERVICE_PORT}:${VIEW_SERVICE_PORT}"
+    environment:
+      - SERVICE_NAME=vector_store_repository
+
+  redis:
+    image: "redis:alpine"
+    container_name: redis
+    ports:
+      - "6379:${QUEUE_REPOSITORY_PORT}"
+    env_file:
+      - .env
+    environment:
+      - SERVICE_NAME=conversation_store
+
+  llm_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: llm_service
+    command: ["python", "llm_service.py"]
+    ports:
+      - "${LLM_SERVICE_PORT}:${LLM_SERVICE_PORT}"
+    env_file:
+      - .env
+    environment:
+      - SERVICE_NAME=llm_service
+
+  view_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: view_service
+    command: [ "streamlit", "run", "view_service.py", "--server.port", "${VIEW_SERVICE_PORT}" ]
+    ports:
+      - "${VIEW_SERVICE_PORT}:${VIEW_SERVICE_PORT}"
+    env_file:
+      - .env
+    environment:
+      - SERVICE_NAME=view_service
+
+volumes:
+  vector_store_data:
