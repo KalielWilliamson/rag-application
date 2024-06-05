@@ -5,7 +5,9 @@
 This runbook provides steps to deploy the RAG application locally using Docker Compose.
 
 This RAG Application leverages Redis for pub/sub messaging between the view, model, and vector db services.
-This enables the services to potentially run on different machines and enables horizontal scaling. 
+This enables the services to potentially run on different machines and enables horizontal scaling.
+
+![RAG Application Architecture](architecture.jpg)
 
 ### Downloading llama-2 quantized model
 You can retrieve the llama-2-7b-chat.Q2_K.gguf from [here](https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF).
