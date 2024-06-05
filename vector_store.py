@@ -20,6 +20,7 @@ class DocumentIndexer:
         self.db = self.load_vector_db()
         self.redis_client = RedisClient()
         self.available_documents = []
+        self.index()
         self.listen_for_updates()
 
     def save_vector_db(self):
@@ -65,6 +66,7 @@ class DocumentIndexer:
         if self.db is None:
             docs = []
             for file in glob.glob("documents/*.txt"):
+                print(f"Indexing {file}")
                 raw_documents = TextLoader(file).load()
                 docs.extend(raw_documents)
                 self.available_documents.append(file)
