@@ -6,7 +6,7 @@ import uuid
 
 import streamlit as st
 from streamlit.runtime.scriptrunner import add_script_run_ctx
-from conversation_state_store import RedisClient
+from conversation_state_store import *
 
 chat_history = st.empty()
 client = RedisClient()
@@ -27,9 +27,9 @@ def clear_session():
 
 def start_heartbeat(session_id):
     def run_heartbeat():
-        entrypoints = client.get('entrypoint')
+        entrypoints = client.get(ENTRYPOINT)
         if session_id not in entrypoints:
-            client.append('entrypoint', session_id)
+            client.append(ENTRYPOINT, session_id)
 
         while True:
             chat_log = client.get(session_id)
@@ -40,6 +40,13 @@ def start_heartbeat(session_id):
     thread.daemon = True
     add_script_run_ctx(thread)
     thread.start()
+
+
+def extract_text_from_file(uploaded_file):
+    if uploaded_file is not None:
+        text = uploaded_file.read().decode('utf-8')
+        return text
+    return ""
 
 
 def app():
@@ -59,22 +66,18 @@ def app():
         for message in messages:
             st.write(message)
 
+    uploaded_file = st.file_uploader("Upload a .txt file", type="txt")
+    if uploaded_file is not None:
+        file_text = extract_text_from_file(uploaded_file)
+        client.append(UNPROCESSED_DOCUMENTS, file_text)
+
     query = st.text_input("Enter your query:")
 
     if st.button("Submit"):
         client.append(session_id, ('user', query))
-        time.sleep(1)
-        st.write("Updated Conversation Log:")
-        messages = client.get(session_id)
-        for message in messages:
-            st.write(message)
 
 
 if __name__ == '__main__':
-    # Check if the Streamlit server is already running to avoid starting multiple instances
-    # client.clear()
-    # client.set('entrypoint', [])
-
     init_session()
     app()
 

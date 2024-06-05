@@ -3,6 +3,10 @@ import os
 
 import redis
 
+UNPROCESSED_DOCUMENTS = 'unprocessed_documents'
+PROCESSED_DOCUMENTS = 'processed_documents'
+ENTRYPOINT = 'entrypoint'
+
 
 class RedisClient:
     def __init__(self, host=None, port=None):
