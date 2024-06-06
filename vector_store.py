@@ -5,6 +5,7 @@ import time
 import uuid
 
 from langchain_community.document_loaders import TextLoader
+from langchain_core.documents import Document
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -37,17 +38,15 @@ class DocumentIndexer:
     def index_single_document(self, document_path=None, raw_text=None):
         if document_path is not None:
             raw_document: str = TextLoader(document_path).load()[0].page_content
-            filename = document_path.split('/')[-1]
         elif raw_text is not None:
             raw_document: str = raw_text
-            filename = f"{uuid.uuid4()}.txt"
         else:
             raise ValueError("Either document_path or raw_text must be provided")
 
-        with open(f"documents/{filename}.txt", "w") as f:
-            f.write(raw_document)
+        document = Document(raw_document)
 
-        self.index()
+        self.db.add_documents([document])
+        self.save_vector_db()
 
     def get_retriever(self):
 
